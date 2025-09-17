@@ -41,6 +41,7 @@ idProjectile::idProjectile
 ================
 */
 idProjectile::idProjectile( void ) {
+	stuck = false;
 	methodOfDeath		= -1;
 	owner				= NULL;
 	memset( &projectileFlags, 0, sizeof( projectileFlags ) );
@@ -633,6 +634,11 @@ bool idProjectile::Collide( const trace_t &collision, const idVec3 &velocity, bo
  	const char*	damageDefName;
  	idVec3		dir;
  	bool		canDamage;
+
+	if (stuck)
+	{
+		return true;
+	}
  	
  	hitTeleporter = false;
 
@@ -713,6 +719,9 @@ bool idProjectile::Collide( const trace_t &collision, const idVec3 &velocity, bo
  		return true;
  	}
  
+
+
+
 	// get the entity the projectile collided with
 	ent = gameLocal.entities[ collision.c.entityNum ];
 	if ( ent == owner.GetEntity() ) {
@@ -733,12 +742,38 @@ bool idProjectile::Collide( const trace_t &collision, const idVec3 &velocity, bo
 		ent = ent->GetTeamMaster( );
 	}
 
+
+
+	if(ent->IsType(idActor::GetClassType())) 
+	{
+	
+	}
+	else
+	{ 
+		physicsObj.PutToRest();
+		stuck = true;
+		CancelEvents(&EV_Explode);
+		PostEventMS(&EV_Explode, 2000);
+
+
+		return true;
+
+
+
+
+	}
+
 	// Can the projectile damage?  
 	canDamage = ent->fl.takedamage && !(( collision.c.material != NULL ) && ( collision.c.material->GetSurfaceFlags() & SURF_NODAMAGE ));
   
  	// direction of projectile
  	dir = velocity;
  	dir.Normalize();
+
+
+
+
+
  
  	// projectiles can apply an additional impulse next to the rigid body physics impulse
 // RAVEN BEGIN
@@ -1534,6 +1569,8 @@ void idGuidedProjectile::Save( idSaveGame *savefile ) const {
 	savefile->WriteInt ( launchTime );
 	savefile->WriteInt ( guideDelay );
 	savefile->WriteInt ( driftDelay );
+
+	savefile->WriteBool(stuck);
 }
 
 /*
@@ -1571,6 +1608,8 @@ void idGuidedProjectile::Restore( idRestoreGame *savefile ) {
 	savefile->ReadInt ( launchTime );
 	savefile->ReadInt ( guideDelay );
 	savefile->ReadInt ( driftDelay );
+
+	savefile->ReadBool(stuck);
 }
 
 /*

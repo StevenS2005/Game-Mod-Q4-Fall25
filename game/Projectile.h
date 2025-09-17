@@ -66,6 +66,8 @@ public :
 	virtual bool			ClientStale( void );
 	
 protected:
+
+	bool stuck;
 	void					SpawnImpactEntities(const trace_t& collision, const idVec3 projectileDirection);
 
 
@@ -352,6 +354,7 @@ private:
 		
 	void				Event_LaunchWarheads ( void );
 };
+
 
 #endif /* !__GAME_PROJECTILE_H__ */
 

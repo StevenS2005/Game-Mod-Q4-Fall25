@@ -218,6 +218,7 @@ void rvWeaponRocketLauncher::OnLaunchProjectile ( idProjectile* proj ) {
 		return;
 	}
 
+
 	// Launch the projectile
 	idEntityPtr<idEntity> ptr;
 	ptr = proj;
