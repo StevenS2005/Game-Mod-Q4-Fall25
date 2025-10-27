@@ -395,11 +395,7 @@ public :
 	void					Restore			( idRestoreGame *savefile );
 
 	virtual void			Think			( void );
-
-protected:
-
-	int					nextDamageTime;
-	const idDict*		radiusDamageDef;
+	virtual void			Explode(const trace_t* collision, const bool showExplodeFX, idEntity* ignore = NULL, const char* sndExplode = "snd_explode");
 };
 
 CLASS_DECLARATION( idProjectile, rvDarkMatterProjectile )
@@ -411,7 +407,6 @@ rvDarkMatterProjectile::rvDarkMatterProjectile
 ================
 */
 rvDarkMatterProjectile::rvDarkMatterProjectile ( void ) {
-	radiusDamageDef = NULL;
 }
 
 /*
@@ -428,8 +423,10 @@ rvDarkMatterProjectile::Spawn
 ================
 */
 void rvDarkMatterProjectile::Spawn ( void ) {
-	nextDamageTime  = 0;
-	radiusDamageDef = gameLocal.FindEntityDefDict ( spawnArgs.GetString ( "def_radius_damage" ) );
+
+	physicsObj.SetClipMask(MASK_ALL);
+	// nextDamageTime  = 0;
+	// radiusDamageDef = gameLocal.FindEntityDefDict ( spawnArgs.GetString ( "def_radius_damage" ) );
 }
 
 /*
@@ -438,7 +435,7 @@ rvDarkMatterProjectile::Save
 ================
 */
 void rvDarkMatterProjectile::Save ( idSaveGame *savefile ) const {
-	savefile->WriteInt ( nextDamageTime );
+	//savefile->WriteInt ( nextDamageTime );
 }
 
 /*
@@ -447,9 +444,9 @@ rvDarkMatterProjectile::Restore
 ================
 */
 void rvDarkMatterProjectile::Restore ( idRestoreGame *savefile ) {
-	savefile->ReadInt ( nextDamageTime );
+	//savefile->ReadInt ( nextDamageTime );
 	
-	radiusDamageDef = gameLocal.FindEntityDefDict ( spawnArgs.GetString ( "def_radius_damage" ) );
+	//radiusDamageDef = gameLocal.FindEntityDefDict ( spawnArgs.GetString ( "def_radius_damage" ) );
 }
 
 /*
@@ -458,13 +455,51 @@ rvDarkMatterProjectile::Think
 ================
 */
 void rvDarkMatterProjectile::Think ( void ) {
-	physicsObj.SetClipMask( MASK_DMGSOLID );
+	physicsObj.SetClipMask(MASK_ALL);
 	idProjectile::Think ( );
 
+	/*
 	if ( gameLocal.time > nextDamageTime ) {
 		gameLocal.RadiusDamage ( GetPhysics()->GetOrigin(), this, owner, owner, NULL, spawnArgs.GetString( "def_radius_damage" ), 1.0f, &hitCount );
 		nextDamageTime = gameLocal.time + SEC2MS ( spawnArgs.GetFloat ( "damageRate", ".05" ) );	
 	}
+	*/
+
 }
+
+
+/*
+================
+rvDarkMatterProjectile::Explode
+================
+*/
+
+void rvDarkMatterProjectile::Explode(const trace_t* collision, const bool showExplodeFX, idEntity* ignore, const char* sndExplode) {
+	gameLocal.Printf("explode works\n");
+
+	if (collision) {
+		idEntity* ent = gameLocal.entities[collision->c.entityNum];
+		if (ent && ent->IsType(idAI::GetClassType())) {
+			const idDict* damageDef = gameLocal.FindEntityDefDict(spawnArgs.GetString("def_damage"));
+			if (damageDef && damageDef->GetFloat("slow_duration", "0") > 0) {
+				float duration = damageDef->GetFloat("slow_duration", "5");
+				float amount = damageDef->GetFloat("slow_amount", "0.3");
+				idAI* monster = static_cast<idAI*>(ent);
+				monster->Slow(duration, amount);
+				gameLocal.Printf("slow works");
+			}
+		}
+	}
+	idProjectile::Explode(collision, showExplodeFX, ignore, sndExplode);
+}
+
+
+
+
+
+
+
+
+
 
 

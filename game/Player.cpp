@@ -988,6 +988,183 @@ bool idInventory::Give( idPlayer *owner, const idDict &spawnArgs, const char *st
 	return true;
 }
 
+
+void idPlayer::ListAllAmmo(void) const {
+	const idDict* ammoTypes = gameLocal.FindEntityDefDict("ammo_types", false);
+
+	for (int i = 0; i < ammoTypes->GetNumKeyVals(); i++) {
+		const idKeyValue* kv = ammoTypes->GetKeyVal(i);
+		const idStr& ammoName = kv->GetKey();
+
+		if (ammoName.Icmp("ammo_none") == 0) {
+			continue;
+		}
+
+		int ammoIndex = inventory.AmmoIndexForAmmoClass(ammoName.c_str());
+
+		if (ammoIndex >= 0 && ammoIndex < MAX_AMMOTYPES) {
+			int ammoCount = inventory.ammo[ammoIndex];
+			int maxAmmo = inventory.MaxAmmoForAmmoClass(const_cast<idPlayer*>(this), ammoName.c_str());
+
+			gameLocal.Printf("%s: %d / %d\n", ammoName.c_str(), ammoCount, maxAmmo);
+		}
+	}
+
+}
+
+void idPlayer::PlantSeed(const char* seedName) {
+	
+
+	int seedIndex = inventory.AmmoIndexForAmmoClass(seedName);
+	if (inventory.ammo[seedIndex] <= 0) {
+		gameLocal.Printf("missing %s to plant.\n", seedName);
+		return;
+	}
+
+	idStr plantNameStr = seedName;
+	plantNameStr.Replace("_seed", "_plant");
+	const char* plantName = plantNameStr.c_str();
+
+	int plantIndex = inventory.AmmoIndexForAmmoClass(plantName);
+	
+
+	inventory.ammo[seedIndex]--;  // minus one seed
+	inventory.ammo[plantIndex]++; // Add one plant
+
+	gameLocal.Printf("Planted 1 %s.\n", seedName);
+}
+
+
+struct Ingredients {
+	idStr	plantname;
+	int		quantity;
+	int		plantIndex;
+};
+
+void idPlayer::CraftPotion(const char* potionName) {
+	
+	const idDict* potionDict = gameLocal.FindEntityDefDict(potionName, false);
+
+	idList<Ingredients> potionrecipe;
+
+	for (int i = 1; i <= 10; i++) { //max 10 indrigents could just change to make higher for future stuff
+		const char* ingredientName = potionDict->GetString(va("craft_ingredient_%d", i)); // va sinceit allows you to do %d which i want
+		if (!*ingredientName) {
+			break;
+		}
+
+
+		Ingredients ingredient;
+		ingredient.plantname = ingredientName;
+
+		ingredient.quantity = potionDict->GetInt(va("craft_quantity_%d", i), "1");
+		ingredient.plantIndex = inventory.AmmoIndexForAmmoClass(ingredient.plantname);
+
+		potionrecipe.Append(ingredient);
+	}
+
+		int potionIndex = inventory.AmmoIndexForAmmoClass(potionName);
+		int maxPotions = inventory.MaxAmmoForAmmoClass(this, potionName);
+		if (inventory.ammo[potionIndex] >= maxPotions) {
+			gameLocal.Printf("Reached max limit of %s.\n", potionName);
+			return;
+		}
+
+		for (int i = 0; i < potionrecipe.Num(); i++) {
+			if (inventory.ammo[potionrecipe[i].plantIndex] < potionrecipe[i].quantity) {
+				gameLocal.Printf("Not enough %s. You need %d.\n", potionrecipe[i].plantname.c_str(), potionrecipe[i].quantity);
+				return;
+			}
+		}
+
+
+		for (int i = 0; i < potionrecipe.Num(); i++) {
+			inventory.ammo[potionrecipe[i].plantIndex] -= potionrecipe[i].quantity;
+		}
+
+		inventory.ammo[potionIndex]++;
+
+		gameLocal.Printf("You crafted 1 %s.\n", potionName);
+
+}
+
+
+void idPlayer::DrinkHealingPotion(void) {
+	int potionIndex = inventory.AmmoIndexForAmmoClass("ammo_healing_potion");
+
+	if (inventory.ammo[potionIndex] > 0) {
+		inventory.ammo[potionIndex]--;
+		gameLocal.Printf("You drank a Healing Potion.\n");
+
+		health += HEALING_POTION_AMOUNT;
+		if (health > inventory.maxHealth) {
+			health = inventory.maxHealth;
+		}
+
+	}
+	else {
+		gameLocal.Printf("You don't have any Healing Potions.\n");
+	}
+}
+
+void idPlayer::DrinkMaximaPotion(void) {
+	int potionIndex = inventory.AmmoIndexForAmmoClass("ammo_maxima_potion");
+
+	if (inventory.ammo[potionIndex] > 0) {
+		inventory.ammo[potionIndex]--;
+		gameLocal.Printf("You drank a Maxima Potion.\n");
+
+		GivePowerUp(POWERUP_QUADDAMAGE, MAXIMA_POTION_DURATION);
+
+	}
+	else {
+		gameLocal.Printf("You don't have any Maxima Potions.\n");
+	}
+}
+
+void idPlayer::DrinkInvisibilityPotion(void) {
+	int potionIndex = inventory.AmmoIndexForAmmoClass("ammo_invisibility_potion");
+
+	if (inventory.ammo[potionIndex] > 0) {
+		inventory.ammo[potionIndex]--;
+		gameLocal.Printf("You drank an Invisibility Potion.\n");
+
+		GivePowerUp(POWERUP_INVISIBILITY, INVISIBILITY_POTION_DURATION);
+	}
+	else {
+		gameLocal.Printf("You don't have any Invisibility Potions.\n");
+	}
+}
+
+void idPlayer::DrinkDefensePotion(void) {
+	int potionIndex = inventory.AmmoIndexForAmmoClass("ammo_defense_potion");
+
+	if (inventory.ammo[potionIndex] > 0) {
+		inventory.ammo[potionIndex]--;
+		gameLocal.Printf("You drank a Defense Potion.\n");
+
+		GivePowerUp(POWERUP_GUARD, DEFENSE_POTION_DURATION);
+
+	}
+	else {
+		gameLocal.Printf("You don't have any Defense Potions.\n");
+	}
+}
+
+void idPlayer::DrinkSpeedPotion(void) {
+	int potionIndex = inventory.AmmoIndexForAmmoClass("ammo_speed_potion");
+
+	if (inventory.ammo[potionIndex] > 0) {
+		inventory.ammo[potionIndex]--;
+		gameLocal.Printf("You drank a Speed Potion.\n");
+
+		GivePowerUp(POWERUP_HASTE, SPEED_POTION_DURATION);
+	}
+	else {
+		gameLocal.Printf("You don't have any Speed Potions.\n");
+	}
+}
+
 /*
 ===============
 idInventoy::Drop
@@ -4301,7 +4478,7 @@ float idPlayer::PowerUpModifier( int type ) {
 	if ( PowerUpActive( POWERUP_HASTE ) ) {
 		switch ( type ) {
 			case PMOD_SPEED:	
-				mod *= 1.3f;
+				mod *= 2.5f;
 				break;
 
 			case PMOD_FIRERATE:

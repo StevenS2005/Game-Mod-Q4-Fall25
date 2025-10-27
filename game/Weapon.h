@@ -25,7 +25,7 @@ typedef enum {
 } weaponStatus_t;
 
 static const int MAX_WEAPONMODS	= 4;
-static const int MAX_AMMOTYPES	= 16;
+static const int MAX_AMMOTYPES	= 40;
 
 class idPlayer;
 class idItem;

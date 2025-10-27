@@ -44,6 +44,8 @@ idAI::idAI
 idAI::idAI ( void ) {
 	projectile_height_to_distance_ratio = 1.0f;
 
+	slowedUntilTime = 0;
+
 	aas						= NULL;
 	aasSensor				= NULL;
 	aasFind					= NULL;
@@ -915,6 +917,7 @@ void idAI::Begin ( void ) {
 	}
 }
 
+
 /*
 ===================
 idAI::WakeUp
@@ -1130,12 +1133,40 @@ bool idAI::DoDormantTests ( void ) {
 	return idActor::DoDormantTests ( );
 }
 
+void idAI::Slow(float slowduration, float amount) {
+	animator.SetPlaybackRate(amount);
+	slowedUntilTime = gameLocal.time + SEC2MS(slowduration);
+}
+
+void idAI::Burn(float burnduration)
+{
+	health -= 10;
+	burnUntilTime = gameLocal.time + SEC2MS(burnduration);
+}
+
+
 /*
 =====================
 idAI::Think
 =====================
 */
 void idAI::Think( void ) {
+
+	 if (slowedUntilTime > 0 && gameLocal.time >= slowedUntilTime) {
+		 animator.SetPlaybackRate(1.0f);
+		 slowedUntilTime = 0;
+		 gameLocal.Printf("slow ran out");
+
+	}
+
+	 if (burnUntilTime > 0 && gameLocal.time >= slowedUntilTime)
+	 {
+		 Burn(0);
+		 burnUntilTime = 0;
+		 gameLocal.Printf("slow ran out");
+
+		 
+	 }
 
 	// if we are completely closed off from the player, don't do anything at all
 	if ( CheckDormant() ) {
@@ -1534,6 +1565,7 @@ idAI::Pain
 =====================
 */
 bool idAI::Pain( idEntity *inflictor, idEntity *attacker, int damage, const idVec3 &dir, int location ) {
+
 	aifl.pain   = idActor::Pain( inflictor, attacker, damage, dir, location );
 	aifl.damage = true;
 
@@ -1601,8 +1633,13 @@ bool idAI::Pain( idEntity *inflictor, idEntity *attacker, int damage, const idVe
 		UpdateEnemyPosition ( true );
 	}	
 
+	
+
+
+
 	return aifl.pain;
 }
+
 
 /*
 =====================
@@ -1754,6 +1791,8 @@ void idAI::Killed( idEntity *inflictor, idEntity *attacker, int damage, const id
 		kv = spawnArgs.MatchPrefix( "def_drops", kv );
 	}
 }
+
+
 
 /***********************************************************************
 

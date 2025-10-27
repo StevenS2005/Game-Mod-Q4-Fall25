@@ -1135,7 +1135,7 @@ void Cmd_Spawn_f( const idCmdArgs &args ) {
 	dict.Set( "classname", value );
 	dict.Set( "angle", va( "%f", yaw + 180 ) );
 
-	org = player->GetPhysics()->GetOrigin() + idAngles( 0, yaw, 0 ).ToForward() * 80 + idVec3( 0, 0, 1 );
+	org = player->GetPhysics()->GetOrigin() + idAngles( 0, yaw, 0 ).ToForward() * 250 + idVec3( 0, 0, 1 );
 	dict.Set( "origin", org.ToString() );
 
 	for( i = 2; i < args.Argc() - 1; i += 2 ) {
@@ -3018,6 +3018,119 @@ void Cmd_TestClientModel_f( const idCmdArgs& args ) {
 
 void Cmd_CheckSave_f( const idCmdArgs &args );
 
+static void Cmd_AllAmmo_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	player->ListAllAmmo();
+}
+
+void Cmd_PlantDittany_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player) {
+		player->PlantSeed("ammo_dittany_seed");
+	}
+}
+
+void Cmd_PlantFluxweed_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player) {
+		player->PlantSeed("ammo_fluxweed_seed");
+	}
+}
+
+void Cmd_PlantKnotgrass_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player) {
+		player->PlantSeed("ammo_knotgrass_seed");
+	}
+}
+
+void Cmd_PlantShrivelfig_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player) {
+		player->PlantSeed("ammo_shrivelfig_seed");
+	}
+}
+
+void Cmd_PlantMallowsweet_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player) {
+		player->PlantSeed("ammo_mallowsweet_seed");
+	}
+}
+
+
+void Cmd_CraftHealingPotion_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player) {
+		player->CraftPotion("ammo_healing_potion");
+	}
+}
+
+void Cmd_CraftMaximaPotion_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player) {
+		player->CraftPotion("ammo_maxima_potion");
+	}
+}
+
+void Cmd_CraftInvisibilityPotion_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player) {
+		player->CraftPotion("ammo_invisibility_potion");
+	}
+}
+
+void Cmd_CraftDefensePotion_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player) {
+		player->CraftPotion("ammo_defense_potion");
+	}
+}
+
+void Cmd_CraftSpeedPotion_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player) {
+		player->CraftPotion("ammo_speed_potion");
+	}
+}
+
+void Cmd_DrinkHealingPotion_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player) { 
+		player->DrinkHealingPotion(); 
+	}
+}
+
+void Cmd_DrinkMaximaPotion_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player) { player->DrinkMaximaPotion(); }
+}
+
+void Cmd_DrinkInvisibilityPotion_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player) { 
+		player->DrinkInvisibilityPotion(); 
+	}
+}
+
+void Cmd_DrinkDefensePotion_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player) { 
+		player->DrinkDefensePotion(); 
+	}
+}
+
+void Cmd_DrinkSpeedPotion_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player) { 
+		player->DrinkSpeedPotion(); 
+	}
+}
+
+
+
+
+
 void Cmd_ShuffleTeams_f( const idCmdArgs& args ) {
 	gameLocal.mpGame.ShuffleTeams();
 }
@@ -3037,6 +3150,9 @@ void Cmd_ClientOverflowReliable_f( const idCmdArgs& args ) {
 	}
 }
 #endif
+
+
+
 
 /*
 =================
@@ -3232,6 +3348,31 @@ void idGameLocal::InitConsoleCommands( void ) {
 	cmdSystem->AddCommand( "buyMenu",				Cmd_ToggleBuyMenu_f,		CMD_FL_GAME,				"Toggle buy menu (if in a buy zone and the game type supports it)" );
 	cmdSystem->AddCommand( "buy",					Cmd_BuyItem_f,				CMD_FL_GAME,				"Buy an item (if in a buy zone and the game type supports it)" );
 // RITUAL END
+
+
+	cmdSystem->AddCommand("list_allammo", Cmd_AllAmmo_f, CMD_FL_GAME, "Lists all ammo count");
+
+	cmdSystem->AddCommand("plantdittany", Cmd_PlantDittany_f, CMD_FL_GAME, "Plants a Dittany seed");
+	cmdSystem->AddCommand("plantfluxweed", Cmd_PlantFluxweed_f, CMD_FL_GAME, "Plants a Fluxweed seed");
+	cmdSystem->AddCommand("plantknotgrass", Cmd_PlantKnotgrass_f, CMD_FL_GAME, "Plants a Knotgrass seed");
+	cmdSystem->AddCommand("plantshrivelfig", Cmd_PlantShrivelfig_f, CMD_FL_GAME, "Plants a Shrivelfig seed");
+	cmdSystem->AddCommand("plantmallowsweet", Cmd_PlantMallowsweet_f, CMD_FL_GAME, "Plants a Mallowsweet seed"); 
+
+	cmdSystem->AddCommand("crafthealingpotion", Cmd_CraftHealingPotion_f, CMD_FL_GAME, "Crafts a Healing Potion.");
+	cmdSystem->AddCommand("craftmaximapotion", Cmd_CraftMaximaPotion_f, CMD_FL_GAME, "Crafts a Maxima Potion.");
+	cmdSystem->AddCommand("craftinvisibilitypotion", Cmd_CraftInvisibilityPotion_f, CMD_FL_GAME, "Crafts an Invisibility Potion.");
+	cmdSystem->AddCommand("craftdefensepotion", Cmd_CraftDefensePotion_f, CMD_FL_GAME, "Crafts a Defense Potion.");
+	cmdSystem->AddCommand("craftspeedpotion", Cmd_CraftSpeedPotion_f, CMD_FL_GAME, "Crafts a Speed Potion.");
+
+	cmdSystem->AddCommand("drinkhealingpotion", Cmd_DrinkHealingPotion_f, CMD_FL_GAME, "drink a healing Potion.");
+	cmdSystem->AddCommand("drinkmaximapotion", Cmd_DrinkMaximaPotion_f, CMD_FL_GAME, "drink a maxima Potion.");
+	cmdSystem->AddCommand("drinkinvisibilitypotion", Cmd_DrinkInvisibilityPotion_f, CMD_FL_GAME, "drink a invisibility Potion.");
+	cmdSystem->AddCommand("drinkdefensepotion", Cmd_DrinkDefensePotion_f, CMD_FL_GAME, "drink a defense Potion.");
+	cmdSystem->AddCommand("drinkspeedpotion", Cmd_DrinkSpeedPotion_f, CMD_FL_GAME, "drink a speed Potion.");
+
+
+
+
 
 }
 

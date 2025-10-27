@@ -141,7 +141,7 @@ rvMonsterGrunt::CheckActions
 */
 bool rvMonsterGrunt::CheckActions ( void ) {
 	// If our health is below the rage threshold then enrage
-	if ( health < rageThreshold ) { 
+	if (health < rageThreshold && slowedUntilTime < gameLocal.time) {
 		PerformAction ( "Torso_Enrage", 4, true );
 		return true;
 	}

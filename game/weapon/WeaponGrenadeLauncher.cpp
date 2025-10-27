@@ -168,35 +168,35 @@ stateResult_t rvWeaponGrenadeLauncher::State_Fire ( const stateParms_t& parms ) 
 rvWeaponGrenadeLauncher::State_Reload
 ================
 */
-stateResult_t rvWeaponGrenadeLauncher::State_Reload ( const stateParms_t& parms ) {
+stateResult_t rvWeaponGrenadeLauncher::State_Reload(const stateParms_t& parms) {
 	enum {
 		STAGE_INIT,
 		STAGE_WAIT,
-	};	
-	switch ( parms.stage ) {
-		case STAGE_INIT:
-			if ( wsfl.netReload ) {
-				wsfl.netReload = false;
-			} else {
-				NetReload ( );
-			}
-			
-			SetStatus ( WP_RELOAD );
-			PlayAnim ( ANIMCHANNEL_ALL, "reload", parms.blendFrames );
-			return SRESULT_STAGE ( STAGE_WAIT );
-			
-		case STAGE_WAIT:
-			if ( AnimDone ( ANIMCHANNEL_ALL, 4 ) ) {
-				AddToClip ( ClipSize() );
-				SetState ( "Idle", 4 );
-				return SRESULT_DONE;
-			}
-			if ( wsfl.lowerWeapon ) {
-				SetState ( "Lower", 4 );
-				return SRESULT_DONE;
-			}
-			return SRESULT_WAIT;
+	};
+	switch (parms.stage) {
+	case STAGE_INIT:
+		if (wsfl.netReload) {
+			wsfl.netReload = false;
+		}
+		else {
+			NetReload();
+		}
+
+		SetStatus(WP_RELOAD);
+		PlayAnim(ANIMCHANNEL_ALL, "reload", parms.blendFrames);
+		return SRESULT_STAGE(STAGE_WAIT);
+
+	case STAGE_WAIT:
+		if (AnimDone(ANIMCHANNEL_ALL, 4)) {
+			AddToClip(ClipSize());
+			SetState("Idle", 4);
+			return SRESULT_DONE;
+		}
+		if (wsfl.lowerWeapon) {
+			SetState("Lower", 4);
+			return SRESULT_DONE;
+		}
+		return SRESULT_WAIT;
 	}
 	return SRESULT_ERROR;
 }
-			

@@ -36,7 +36,7 @@ const int	FOCUS_GUI_TIME				= 300;
 const int	FOCUS_USABLE_TIME			= 100;
 
 const int	MAX_WEAPONS					= 16;
-const int	MAX_AMMO					= 16;
+const int	MAX_AMMO					= 40;
 const int	CARRYOVER_FLAG_AMMO			= 0x40000000;
 const int	CARRYOVER_FLAG_ARMOR_LIGHT	= 0x20000000;
 const int	CARRYOVER_FLAG_ARMOR_HEAVY	= 0x10000000;
@@ -531,6 +531,19 @@ public:
 	bool					GiveInventoryItem( const char *name );
 	void					RemoveInventoryItem( const char *name );
 	idDict *				FindInventoryItem( const char *name );
+	void					ListAllAmmo(void) const;
+	void					PlantSeed(const char* seedName);
+	void					CraftPotion(const char* potionName);
+	void					DrinkHealingPotion(void);
+	void					DrinkMaximaPotion(void);
+	void					DrinkInvisibilityPotion(void);
+	void					DrinkDefensePotion(void);
+	void					DrinkSpeedPotion(void);
+	static const int HEALING_POTION_AMOUNT = 50;
+	static const int MAXIMA_POTION_DURATION = 30 * 1000;      // 30 seconds
+	static const int INVISIBILITY_POTION_DURATION = 30 * 1000;
+	static const int DEFENSE_POTION_DURATION = 30 * 1000;     
+	static const int SPEED_POTION_DURATION = 30 * 1000;       
 
 	// Wrist computer
 	void					GiveObjective				( const char *title, const char *text, const char *screenshot );

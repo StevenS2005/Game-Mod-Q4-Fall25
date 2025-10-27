@@ -642,6 +642,11 @@ public:
 	void					StaticMove						( void );
 	void					RVMasterMove					( void );
 	void					SetMoveType						( moveType_t moveType );
+
+	void					Slow(float duration, float amount);
+	void					Burn(float duration);
+
+
 	//twhitaker: added custom move type
 	virtual void			CustomMove						( void );
 
@@ -960,6 +965,7 @@ protected:
 	virtual void			OnStopAction					( void );
 	virtual void			OnSetKey						( const char* key, const char* value );
 
+
 	/*
 	===============================================================================
 									Movement / Turning
@@ -984,6 +990,10 @@ protected:
 	void					AnimTurn						( float angles, bool force );
 
 	bool					ReachedPos						( const idVec3 &pos, const aiMoveCommand_t moveCommand, float range = 0.0f ) const;
+
+	int                     slowedUntilTime = 0;
+	int						burnUntilTime = 0;
+
 
 	/*
 	===============================================================================
